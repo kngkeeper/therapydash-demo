@@ -1,0 +1,20 @@
+# /etc/systemd/system/therapydash-frontend.service
+[Unit]
+Description=TherapyDash Angular Frontend
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/therapydash-demo
+ExecStart=/usr/bin/ng serve --host 0.0.0.0 --port 4200
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=therapydash-frontend
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
