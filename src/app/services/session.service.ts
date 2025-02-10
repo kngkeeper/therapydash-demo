@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface Session {
   id: number;
@@ -29,7 +30,7 @@ interface SessionResponse {
   providedIn: 'root'
 })
 export class SessionService {
-  private apiUrl = 'http://localhost:3000/sessions'; // Update with your API endpoint
+  private apiUrl = `${environment.apiUrl}/sessions`;
 
   constructor(
     private http: HttpClient,
