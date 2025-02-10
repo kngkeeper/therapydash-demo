@@ -7,4 +7,4 @@ The frontend is an Angular application written in Typescript. I chose Angular in
 
 For cloud deployment I chose Akamai, as I already use it for some personal things (but deploying to other cloud services would be trivial). [Here](https://therapydash.7447a.ca/) is a live demo.
 
-To run locally, use the provided `start-dev` scripts. There is a Windows `.bat` file and a *nix `.sh` script. The frontend starts locally on port 4200, and the backend on port 3000. 
+To run locally, use the provided `start-dev` scripts. There is a Windows `.bat` file and a *nix `.sh` script. The frontend starts locally on port 4200, and the backend on port 3000. Make sure Node and NPM are installed and in your path.
