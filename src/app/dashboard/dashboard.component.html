@@ -1,0 +1,275 @@
+<div class="container">
+  <h2>Therapy Sessions Dashboard</h2>
+
+  <!-- Session Actions -->
+  <div class="actions mb-4">
+    <button *ngIf="userRole === 'client'"
+            class="btn btn-primary"
+            (click)="openBookingModal()">
+      Book New Session
+    </button>
+    <button *ngIf="userRole === 'therapist'"
+            class="btn btn-primary"
+            (click)="openCreateSlotModal()">
+      Create New Session Slot
+    </button>
+  </div>
+
+  <!-- Sessions Tabs -->
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'upcoming'" (click)="activeTab = 'upcoming'">
+        Upcoming Sessions
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'past'" (click)="activeTab = 'past'">
+        Past Sessions
+      </a>
+    </li>
+  </ul>
+
+  <!-- Sessions List -->
+  <div class="sessions-list">
+    <div *ngIf="isLoading" class="text-center">
+      <p>Loading sessions...</p>
+    </div>
+
+    <div *ngIf="!isLoading && sessions.length === 0" class="text-center">
+      <p>No {{activeTab}} sessions found.</p>
+    </div>
+
+    <div *ngFor="let session of filteredSessions" class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="card-title">Session #{{session.id}}</h5>
+            <p class="card-text">
+              <strong>Date:</strong> {{formatSessionDateTime(session.datetime) | date:'medium'}}<br>
+              <strong>Duration:</strong> {{session.duration}} minutes<br>
+              <strong>Status:</strong> <span class="badge" [class.bg-success]="session.status === 'booked'"
+                                          [class.bg-warning]="session.status === 'cancelled'"
+                                          [class.bg-secondary]="session.status === 'available'">
+                {{session.status}}
+              </span>
+            </p>
+            <p class="card-text" *ngIf="session.feedback">
+              <strong>Feedback:</strong> {{session.feedback}}
+            </p>
+          </div>
+          <div>
+            <button *ngIf="canLeaveFeedback(session)"
+                    class="btn btn-primary btn-sm me-2"
+                    (click)="openFeedbackModal(session)">
+              Leave Feedback
+            </button>
+            <button *ngIf="canCancelSession(session)" class="btn btn-danger btn-sm"
+                    (click)="cancelSession(session.id)">
+              Cancel
+            </button>
+            <button *ngIf="canRescheduleSession(session)" class="btn btn-warning btn-sm me-2"
+                    (click)="openRescheduleModal(session)">
+              Reschedule
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Slot Modal -->
+<div class="modal" [class.show]="showCreateSlotModal" [style.display]="showCreateSlotModal ? 'block' : 'none'">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create New Session Slot</h5>
+        <button type="button" class="btn-close" (click)="closeCreateSlotModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="createSlotForm" (ngSubmit)="onCreateSlot()">
+          <div class="mb-3">
+            <label for="date" class="form-label">Date</label>
+            <input type="date"
+                   class="form-control"
+                   id="date"
+                   formControlName="date"
+                   [min]="minDate">
+            <div class="invalid-feedback" *ngIf="createSlotForm.get('date')?.touched && createSlotForm.get('date')?.invalid">
+              Please select a valid date
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="time" class="form-label">Time</label>
+            <input type="time"
+                   class="form-control"
+                   id="time"
+                   formControlName="time">
+            <div class="invalid-feedback" *ngIf="createSlotForm.get('time')?.touched && createSlotForm.get('time')?.invalid">
+              Please select a valid time
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="duration" class="form-label">Duration (minutes)</label>
+            <select class="form-control"
+                    id="duration"
+                    formControlName="duration">
+              <option value="30">30 minutes</option>
+              <option value="60">60 minutes</option>
+              <option value="90">90 minutes</option>
+              <option value="120">120 minutes</option>
+            </select>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                (click)="closeCreateSlotModal()">Cancel</button>
+        <button type="button"
+                class="btn btn-primary"
+                [disabled]="!createSlotForm.valid"
+                (click)="onCreateSlot()">Create Slot</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div class="modal-backdrop fade show" *ngIf="showCreateSlotModal"></div>
+
+<!-- Booking Modal -->
+<div class="modal" [class.show]="showBookingModal" [style.display]="showBookingModal ? 'block' : 'none'">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Book a Session</h5>
+        <button type="button" class="btn-close" (click)="closeBookingModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="isLoadingAvailable" class="text-center my-4">
+          <p>Loading available sessions...</p>
+        </div>
+
+        <div *ngIf="!isLoadingAvailable && availableSessions.length === 0" class="text-center my-4">
+          <p>No available sessions found.</p>
+        </div>
+
+        <div class="available-sessions" style="max-height: 400px; overflow-y: auto;">
+          <div *ngFor="let session of availableSessions" class="card mb-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-2">{{formatSessionDateTime(session.datetime)}}</h6>
+                  <p class="mb-1">
+                    <strong>Therapist:</strong> {{session.therapist.name}} {{session.therapist.surname}}<br>
+                    <strong>Duration:</strong> {{session.duration}} minutes
+                  </p>
+                </div>
+                <button class="btn btn-primary"
+                        (click)="bookSession(session.id)">
+                  Book
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                (click)="closeBookingModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add another backdrop for booking modal -->
+<div class="modal-backdrop fade show" *ngIf="showBookingModal"></div>
+
+<!-- Add Feedback Modal -->
+<div class="modal" [class.show]="showFeedbackModal" [style.display]="showFeedbackModal ? 'block' : 'none'">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Leave Feedback</h5>
+        <button type="button" class="btn-close" (click)="closeFeedbackModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="feedbackForm" (ngSubmit)="submitFeedback()">
+          <div class="mb-3">
+            <label for="feedback" class="form-label">Your Feedback</label>
+            <textarea
+              class="form-control"
+              id="feedback"
+              formControlName="feedback"
+              rows="4"
+              placeholder="Share your thoughts about this session..."></textarea>
+            <div class="invalid-feedback" *ngIf="feedbackForm.get('feedback')?.touched && feedbackForm.get('feedback')?.invalid">
+              Please enter valid feedback (minimum 3 characters)
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeFeedbackModal()">Cancel</button>
+        <button type="button" class="btn btn-primary"
+                [disabled]="!feedbackForm.valid"
+                (click)="submitFeedback()">Submit Feedback</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add backdrop for feedback modal -->
+<div class="modal-backdrop fade show" *ngIf="showFeedbackModal"></div>
+
+<!-- Reschedule Modal -->
+<div class="modal" [class.show]="showRescheduleModal" [style.display]="showRescheduleModal ? 'block' : 'none'">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Reschedule Session</h5>
+        <button type="button" class="btn-close" (click)="closeRescheduleModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="rescheduleForm">
+          <div class="mb-3">
+            <label for="rescheduleDate" class="form-label">New Date</label>
+            <input type="date"
+                   class="form-control"
+                   id="rescheduleDate"
+                   formControlName="date"
+                   [min]="minDate">
+          </div>
+
+          <div class="mb-3">
+            <label for="rescheduleTime" class="form-label">New Time</label>
+            <input type="time"
+                   class="form-control"
+                   id="rescheduleTime"
+                   formControlName="time">
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeRescheduleModal()">Cancel</button>
+        <button type="button" class="btn btn-primary"
+                [disabled]="!rescheduleForm.valid"
+                (click)="onReschedule()">Reschedule</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade show" *ngIf="showRescheduleModal"></div>

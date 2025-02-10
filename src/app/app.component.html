@@ -1,0 +1,10 @@
+<nav *ngIf="authService.isLoggedIn | async" class="navbar">
+    <div class="container">
+        <span class="navbar-brand">Dashboard</span>
+        <button class="btn btn-outline-light" (click)="authService.logout()">Logout</button>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <router-outlet></router-outlet>
+</div>

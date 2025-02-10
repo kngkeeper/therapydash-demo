@@ -1,0 +1,307 @@
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1050;
+  overflow-x: hidden;
+  overflow-y: auto;
+  outline: 0;
+  display: none; // Hide by default
+
+  &.show {
+    display: block;
+  }
+}
+
+.invalid-feedback {
+  display: block;
+}
+
+.available-sessions {
+  .card {
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+  }
+}
+
+// Prevent body scrolling when modal is open
+:host {
+  &:has(.modal.show) {
+    overflow: hidden;
+  }
+  display: block;
+  padding: 24px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.actions {
+  .btn {
+    border-radius: 28px;
+    padding: 12px 24px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    &.btn-primary {
+      color: white;
+
+      &:hover {
+        color: white;
+      }
+    }
+
+    &.btn-danger {
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+      }
+    }
+
+    &.btn-warning {
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(255, 193, 7, 0.2);
+      }
+    }
+
+    &.btn-secondary {
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
+      }
+    }
+  }
+}
+
+.nav-tabs {
+  border: none;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: row;
+
+  .nav-item {
+    margin-right: 24px;
+    display: inline-block;
+  }
+
+  .nav-link {
+    border: none;
+    padding: 12px 16px;
+    font-weight: 500;
+    color: #666;
+    position: relative;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+    cursor: pointer;  // Add this
+    text-decoration: none;  // Add this
+
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: transparent;
+      transition: background-color 0.3s ease;
+    }
+
+    &.active {
+      color: #007bff;
+      background: none;
+
+      &:after {
+        background: #007bff;
+      }
+    }
+
+    &:hover {
+      color: #007bff;
+      border: none;
+      background: none;
+      text-decoration: none;  // Add this
+    }
+  }
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+  background-color: white; // Add white background
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+
+  .card-body {
+    padding: 24px;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+
+  .badge {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+}
+
+// Modal styling
+.modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  pointer-events: auto;
+  background-color: #fff; // Add background color
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  outline: 0;
+  z-index: 1061; // Higher than dialog
+
+  .modal-header {
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .modal-title {
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .btn-close {
+      padding: 0.5rem;
+      margin: -0.5rem -0.5rem -0.5rem auto;
+      background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+      border: 0;
+      border-radius: 0.25rem;
+      opacity: .5;
+      cursor: pointer;
+      width: 1.5rem;
+      height: 1.5rem;
+
+      &:hover {
+        opacity: .75;
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.25rem rgba(0,0,0,.25);
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 24px;
+  }
+
+  .modal-footer {
+    border-top: 1px solid rgba(0,0,0,0.08);
+    padding: 20px 24px;
+  }
+}
+
+.modal-dialog {
+  position: relative;
+  width: auto;
+  margin: 1.75rem auto;
+  max-width: 500px; // Add max-width
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  min-height: calc(100% - 3.5rem);
+  z-index: 1060; // Higher than backdrop
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+
+  &.show {
+    opacity: 1;
+  }
+}
+
+// When modal is open, prevent body scrolling
+body.modal-open {
+  overflow: hidden;
+  padding-right: 17px; // Compensate for scrollbar disappearance
+}
+
+.form-control {
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid rgba(0,0,0,0.12);
+  transition: all 0.3s ease;
+
+  &:focus {
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+    border-color: #007bff;
+  }
+}
+
+// Available sessions scrollable area
+.available-sessions {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+
+    &:hover {
+      background: #666;
+    }
+  }
+}
+
+// For the booking modal which is larger
+.modal-dialog.modal-lg {
+  max-width: 800px;
+}
