@@ -13,9 +13,13 @@ const { sequelize } = require('./models');
 const app = express();
 
 app.use(cors({
-  origin: [/^https:\/\/(.*\.)?therapydash\.7447a\.ca$/, 'http://localhost:4200'],
+  origin: [
+    /^https:\/\/(.*\.)?therapydash\.7447a\.ca$/,
+    'https://therapyapi.7447a.ca',
+    'http://localhost:4200'
+  ],
   credentials: true,
-  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'], // Add OPTIONS
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: [
     'Content-Type', 
     'Authorization',
