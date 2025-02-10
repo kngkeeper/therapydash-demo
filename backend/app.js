@@ -12,7 +12,12 @@ const { sequelize } = require('./models');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: ['https://therapydash.7447a.ca', 'http://localhost:4200'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 const PORT = process.env.PORT || 3000;
 
