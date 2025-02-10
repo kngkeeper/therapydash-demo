@@ -15,8 +15,20 @@ const app = express();
 app.use(cors({
   origin: [/^https:\/\/(.*\.)?therapydash\.7447a\.ca$/, 'http://localhost:4200'],
   credentials: true,
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'], // Add OPTIONS
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization',
+    'Origin',
+    'X-Requested-With',
+    'Accept',
+    'Access-Control-Allow-Origin',
+    'Access-Control-Allow-Headers',
+    'Access-Control-Allow-Methods'
+  ],
+  exposedHeaders: ['Access-Control-Allow-Origin'],
+  preflightContinue: true,
+  optionsSuccessStatus: 204
 }));
 
 const PORT = process.env.PORT || 3000;
@@ -26,6 +38,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Add this after CORS middleware but before routes
+app.options('*', cors()); // Enable pre-flight for all routes
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
